@@ -332,3 +332,23 @@ src/churn_predictor/feature_engineering.py:141:89: E501 Line too long (98 > 88)
 src/churn_predictor/feature_engineering.py:146:89: E501 Line too long (134 > 88)
 tests/test_api.py:49:89: E501 Line too long (90 > 88)
 Found 27 errors (9 fixed, 18 remaining).
+
+
+(churn) mohamed@DESKTOP-SPND545:/mnt/c/Users/moham/8_churn$ git commit -m "Fix linting errors and finalize project"
+trim trailing whitespace.................................................Passed
+fix end of files.........................................................Passed
+check yaml...........................................(no files to check)Skipped
+check for added large files..............................................Passed
+ruff.....................................................................Passed
+ruff-format..............................................................Passed
+black....................................................................Passed
+Auto packing the repository in background for optimum performance.
+See "git help gc" for manual housekeeping.
+warning: The last gc run reported the following. Please correct the root cause
+and remove .git/gc.log
+Automatic cleanup will not be performed until the file is removed.
+
+warning: There are too many unreachable loose objects; run 'git prune' to remove them.
+
+[main 31df316] Fix linting errors and finalize project
+ 16 files changed, 728 insertions(+), 482 deletions(-)
