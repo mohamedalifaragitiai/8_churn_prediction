@@ -1,11 +1,14 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
+
 
 class PredictionRequest(BaseModel):
     """
     Pydantic model for the input features for a single prediction.
     This should match the user-level features created in Phase 1.
     """
+
     tenure: int
     total_songs: int
     total_listen_time: float
@@ -22,7 +25,7 @@ class PredictionRequest(BaseModel):
     os_Mac_OS_X: bool = False
     os_Windows: bool = False
     # Add other OS/browser dummy columns as needed
-    
+
     class Config:
         schema_extra = {
             "example": {
@@ -42,10 +45,12 @@ class PredictionRequest(BaseModel):
             }
         }
 
+
 class PredictionResponse(BaseModel):
     """
     Pydantic model for the prediction output.
     """
+
     churn_prediction: Optional[int] = None
     churn_probability: Optional[float] = None
     error: Optional[str] = None

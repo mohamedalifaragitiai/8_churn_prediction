@@ -1,22 +1,33 @@
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score, f1_score, precision_score, recall_score, precision_recall_curve, auc
-import mlflow
-import mlflow.sklearn
-import joblib
 import os
-import matplotlib.pyplot as plt
 import sys
 
+import joblib
+import matplotlib.pyplot as plt
+import mlflow
+import mlflow.sklearn
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import (
+    auc,
+    f1_score,
+    precision_recall_curve,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
+from sklearn.model_selection import train_test_split
+
 # Add the project root to the Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Define paths for the new model
-DATA_PATH = 'data/processed_user_features.csv'
-ARTIFACTS_DIR = 'ml_artifacts'
-MODEL_PATH = os.path.join(ARTIFACTS_DIR, 'random_forest_churn_model.pkl') # <-- Updated model name
-FEATURES_PATH = os.path.join(ARTIFACTS_DIR, 'feature_list.joblib')
+DATA_PATH = "data/processed_user_features.csv"
+ARTIFACTS_DIR = "ml_artifacts"
+MODEL_PATH = os.path.join(
+    ARTIFACTS_DIR, "random_forest_churn_model.pkl"
+)  # <-- Updated model name
+FEATURES_PATH = os.path.join(ARTIFACTS_DIR, "feature_list.joblib")
+
 
 def main():
     """
@@ -27,11 +38,11 @@ def main():
 
     os.makedirs(ARTIFACTS_DIR, exist_ok=True)
     df = pd.read_csv(DATA_PATH)
-    
+
     # Define features and target
-    y = df['churn']
-    X = df.drop(columns=['userId', 'churn'])
-    
+    y = df["churn"]
+    X = df.drop(columns=["userId", "churn"])
+
     # Save feature list for the API
     joblib.dump(list(X.columns), FEATURES_PATH)
 
@@ -44,10 +55,10 @@ def main():
     # Initialize RandomForestClassifier
     # Use class_weight='balanced' to handle class imbalance automatically.
     model = RandomForestClassifier(
-        n_estimators=100,       # A good starting point
+        n_estimators=100,  # A good starting point
         random_state=42,
-        class_weight='balanced', # This is the key parameter for imbalance
-        n_jobs=-1               # Use all available CPU cores
+        class_weight="balanced",  # This is the key parameter for imbalance
+        n_jobs=-1,  # Use all available CPU cores
     )
     # --- END OF CHANGE ---
 
@@ -59,7 +70,7 @@ def main():
 
         # Train the model
         model.fit(X_train, y_train)
-        
+
         # Evaluate model performance
         y_pred_proba = model.predict_proba(X_val)[:, 1]
         y_pred = model.predict(X_val)
@@ -73,21 +84,21 @@ def main():
             "AUC_ROC": auc_roc,
             "F1_Score": f1,
             "Precision": precision,
-            "Recall": recall
+            "Recall": recall,
         }
         mlflow.log_metrics(metrics)
         print("Evaluation Metrics:", metrics)
-        
+
         # Log Precision-Recall curve
         precision_vals, recall_vals, _ = precision_recall_curve(y_val, y_pred_proba)
         pr_auc = auc(recall_vals, precision_vals)
         mlflow.log_metric("PR_AUC", pr_auc)
-        
+
         fig, ax = plt.subplots()
-        ax.plot(recall_vals, precision_vals, label=f'PR AUC = {pr_auc:.2f}')
-        ax.set_title('Precision-Recall Curve')
-        ax.set_xlabel('Recall')
-        ax.set_ylabel('Precision')
+        ax.plot(recall_vals, precision_vals, label=f"PR AUC = {pr_auc:.2f}")
+        ax.set_title("Precision-Recall Curve")
+        ax.set_xlabel("Recall")
+        ax.set_ylabel("Precision")
         ax.legend()
         plt.savefig("pr_curve.png")
         mlflow.log_artifact("pr_curve.png")
@@ -99,5 +110,6 @@ def main():
 
     print(f"Model training complete. Model saved to {MODEL_PATH}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
