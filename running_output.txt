@@ -1,0 +1,271 @@
+(churn) mohamed@DESKTOP-SPND545:/mnt/c/Users/moham/8_churn$ make install
+--- Creating virtual environment named 'churn' ---
+--- Installing dependencies with uv ---
+
+Installation complete. Activate with: source churn/bin/activate
+(churn) mohamed@DESKTOP-SPND545:/mnt/c/Users/moham/8_churn$ 
+(churn) mohamed@DESKTOP-SPND545:/mnt/c/Users/moham/8_churn$ 
+(churn) mohamed@DESKTOP-SPND545:/mnt/c/Users/moham/8_churn$ make all
+
+--- (1/3) Running Feature Engineering ---
+Starting feature engineering...
+Found 37 churned users based on trigger events and inactivity.
+Feature engineering complete. Processed data saved to data/processed_user_features.csv
+Shape of processed data: (225, 26)
+Churn distribution:
+ churn
+0    0.835556
+1    0.164444
+Name: proportion, dtype: float64
+
+--- (2/3) Finding Best Model with AutoML (AutoGluon) ---
+--- Starting Automated Model Comparison with AutoGluon ---
+Verbosity: 2 (Standard Logging)
+=================== System Info ===================
+AutoGluon Version:  1.4.0
+Python Version:     3.12.3
+Operating System:   Linux
+Platform Machine:   x86_64
+Platform Version:   #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025
+CPU Count:          20
+Memory Avail:       5.24 GB / 7.60 GB (69.0%)
+Disk Space Avail:   37.18 GB / 169.37 GB (22.0%)
+===================================================
+Presets specified: ['best_quality']
+Using hyperparameters preset: hyperparameters='zeroshot'
+Setting dynamic_stacking from 'auto' to True. Reason: Enable dynamic_stacking when use_bag_holdout is disabled. (use_bag_holdout=False)
+Stack configuration (auto_stack=True): num_stack_levels=1, num_bag_folds=8, num_bag_sets=1
+DyStack is enabled (dynamic_stacking=True). AutoGluon will try to determine whether the input data is affected by stacked overfitting and enable or disable stacking as a consequence.
+        This is used to identify the optimal `num_stack_levels` value. Copies of AutoGluon will be fit on subsets of the data. Then holdout validation data is used to detect stacked overfitting.
+        Running DyStack for up to 150s of the 600s of remaining time (25%).
+        Running DyStack sub-fit in a ray process to avoid memory leakage. Enabling ray logging (enable_ray_logging=True). Specify `ds_args={'enable_ray_logging': False}` if you experience logging issues.
+2025-08-22 02:30:40,819 ERROR services.py:1351 -- Failed to start the dashboard 
+2025-08-22 02:30:40,820 ERROR services.py:1376 -- Error should be written to 'dashboard.log' or 'dashboard.err'. We are printing the last 20 lines for you. See 'https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#logging-directory-structure' to find where the log file is.
+2025-08-22 02:30:40,820 ERROR services.py:1386 -- Couldn't read dashboard.log file. Error: cannot mmap an empty file. It means the dashboard is broken even before it initializes the logger (mostly dependency issues). Reading the dashboard.err file which contains stdout/stderr.
+2025-08-22 02:30:40,820 ERROR services.py:1420 -- Failed to read dashboard.err file: cannot mmap an empty file. It is unexpected. Please report an issue to Ray github. https://github.com/ray-project/ray/issues
+2025-08-22 02:30:43,140 INFO worker.py:1852 -- Started a local Ray instance.
+                Context path: "/mnt/c/Users/moham/8_churn/ml_artifacts/autogluon/ds_sub_fit/sub_fit_ho"
+(_dystack pid=46754) Running DyStack sub-fit ...
+(_dystack pid=46754) Beginning AutoGluon training ... Time limit = 7s
+(_dystack pid=46754) AutoGluon will save models to "/mnt/c/Users/moham/8_churn/ml_artifacts/autogluon/ds_sub_fit/sub_fit_ho"
+(_dystack pid=46754) Train Data Rows:    200
+(_dystack pid=46754) Train Data Columns: 25
+(_dystack pid=46754) Label Column:       churn
+(_dystack pid=46754) Problem Type:       binary
+(_dystack pid=46754) Preprocessing data ...
+(_dystack pid=46754) Selected class <--> label mapping:  class 1 = 1, class 0 = 0
+(_dystack pid=46754) Using Feature Generators to preprocess the data ...
+(_dystack pid=46754) Fitting AutoMLPipelineFeatureGenerator...
+(_dystack pid=46754)    Available Memory:                    4731.72 MB
+(_dystack pid=46754)    Train Data (Original)  Memory Usage: 0.02 MB (0.0% of available memory)
+(_dystack pid=46754)    Inferring data type of each feature based on column values. Set feature_metadata_in to manually specify special dtypes of the features.
+(_dystack pid=46754)    Stage 1 Generators:
+(_dystack pid=46754)            Fitting AsTypeFeatureGenerator...
+(_dystack pid=46754)                    Note: Converting 10 features to boolean dtype as they only contain 2 unique values.
+(_dystack pid=46754)    Stage 2 Generators:
+(_dystack pid=46754)            Fitting FillNaFeatureGenerator...
+(_dystack pid=46754)    Stage 3 Generators:
+(_dystack pid=46754)            Fitting IdentityFeatureGenerator...
+(_dystack pid=46754)    Stage 4 Generators:
+(_dystack pid=46754)            Fitting DropUniqueFeatureGenerator...
+(_dystack pid=46754)    Stage 5 Generators:
+(_dystack pid=46754)            Fitting DropDuplicatesFeatureGenerator...
+(_dystack pid=46754)    Useless Original Features (Count: 4): ['gender_nan', 'last_level_nan', 'os_nan', 'browser_nan']
+(_dystack pid=46754)            These features carry no predictive signal and should be manually investigated.
+(_dystack pid=46754)            This is typically a feature which has the same value for all rows.
+(_dystack pid=46754)            These features do not need to be present at inference time.
+(_dystack pid=46754)    Unused Original Features (Count: 1): ['browser_Mobile Safari']
+(_dystack pid=46754)            These features were not used to generate any of the output features. Add a feature generator compatible with these features to utilize them.
+(_dystack pid=46754)            Features can also be unused if they carry very little information, such as being categorical but having almost entirely unique values or being duplicates of other features.
+(_dystack pid=46754)            These features do not need to be present at inference time.
+(_dystack pid=46754)            ('bool', []) : 1 | ['browser_Mobile Safari']
+(_dystack pid=46754)    Types of features in original data (raw dtype, special dtypes):
+(_dystack pid=46754)            ('bool', [])  : 9 | ['gender_M', 'last_level_paid', 'os_Mac OS X', 'os_Ubuntu', 'os_Windows', ...]
+(_dystack pid=46754)            ('float', []) : 2 | ['total_listen_time', 'avg_songs_per_session']
+(_dystack pid=46754)            ('int', [])   : 9 | ['userId', 'total_songs', 'num_artists', 'num_thumbs_up', 'num_thumbs_down', ...]
+(_dystack pid=46754)    Types of features in processed data (raw dtype, special dtypes):
+(_dystack pid=46754)            ('float', [])     : 2 | ['total_listen_time', 'avg_songs_per_session']
+(_dystack pid=46754)            ('int', [])       : 9 | ['userId', 'total_songs', 'num_artists', 'num_thumbs_up', 'num_thumbs_down', ...]
+(_dystack pid=46754)            ('int', ['bool']) : 9 | ['gender_M', 'last_level_paid', 'os_Mac OS X', 'os_Ubuntu', 'os_Windows', ...]
+(_dystack pid=46754)    0.0s = Fit runtime
+(_dystack pid=46754)    20 features in original data used to generate 20 features in processed data.
+(_dystack pid=46754)    Train Data (Processed) Memory Usage: 0.02 MB (0.0% of available memory)
+(_dystack pid=46754) Data preprocessing and feature engineering runtime = 0.05s ...
+(_dystack pid=46754) AutoGluon will gauge predictive performance using evaluation metric: 'roc_auc'
+(_dystack pid=46754)    This metric expects predicted probabilities rather than predicted class labels, so you'll need to use predict_proba() instead of predict()
+(_dystack pid=46754)    To change this, specify the eval_metric parameter of Predictor()
+(_dystack pid=46754) Large model count detected (110 configs) ... Only displaying the first 3 models of each family. To see all, set `verbosity=3`.
+(_dystack pid=46754) User-specified model hyperparameters to be fit:
+(_dystack pid=46754) {
+(_dystack pid=46754)    'NN_TORCH': [{}, {'activation': 'elu', 'dropout_prob': 0.10077639529843717, 'hidden_size': 108, 'learning_rate': 0.002735937344002146, 'num_layers': 4, 'use_batchnorm': True, 'weight_decay': 1.356433327634438e-12, 'ag_args': {'name_suffix': '_r79', 'priority': -2}}, {'activation': 'elu', 'dropout_prob': 0.11897478034205347, 'hidden_size': 213, 'learning_rate': 0.0010474382260641949, 'num_layers': 4, 'use_batchnorm': False, 'weight_decay': 5.594471067786272e-10, 'ag_args': {'name_suffix': '_r22', 'priority': -7}}],
+(_dystack pid=46754)    'GBM': [{'extra_trees': True, 'ag_args': {'name_suffix': 'XT'}}, {}, {'learning_rate': 0.03, 'num_leaves': 128, 'feature_fraction': 0.9, 'min_data_in_leaf': 3, 'ag_args': {'name_suffix': 'Large', 'priority': 0, 'hyperparameter_tune_kwargs': None}}],
+(_dystack pid=46754)    'CAT': [{}, {'depth': 6, 'grow_policy': 'SymmetricTree', 'l2_leaf_reg': 2.1542798306067823, 'learning_rate': 0.06864209415792857, 'max_ctr_complexity': 4, 'one_hot_max_size': 10, 'ag_args': {'name_suffix': '_r177', 'priority': -1}}, {'depth': 8, 'grow_policy': 'Depthwise', 'l2_leaf_reg': 2.7997999596449104, 'learning_rate': 0.031375015734637225, 'max_ctr_complexity': 2, 'one_hot_max_size': 3, 'ag_args': {'name_suffix': '_r9', 'priority': -5}}],
+(_dystack pid=46754)    'XGB': [{}, {'colsample_bytree': 0.6917311125174739, 'enable_categorical': False, 'learning_rate': 0.018063876087523967, 'max_depth': 10, 'min_child_weight': 0.6028633586934382, 'ag_args': {'name_suffix': '_r33', 'priority': -8}}, {'colsample_bytree': 0.6628423832084077, 'enable_categorical': False, 'learning_rate': 0.08775715546881824, 'max_depth': 5, 'min_child_weight': 0.6294123374222513, 'ag_args': {'name_suffix': '_r89', 'priority': -16}}],
+(_dystack pid=46754)    'FASTAI': [{}, {'bs': 256, 'emb_drop': 0.5411770367537934, 'epochs': 43, 'layers': [800, 400], 'lr': 0.01519848858318159, 'ps': 0.23782946566604385, 'ag_args': {'name_suffix': '_r191', 'priority': -4}}, {'bs': 2048, 'emb_drop': 0.05070411322605811, 'epochs': 29, 'layers': [200, 100], 'lr': 0.08974235041576624, 'ps': 0.10393466140748028, 'ag_args': {'name_suffix': '_r102', 'priority': -11}}],
+(_dystack pid=46754)    'RF': [{'criterion': 'gini', 'ag_args': {'name_suffix': 'Gini', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'entropy', 'ag_args': {'name_suffix': 'Entr', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'squared_error', 'ag_args': {'name_suffix': 'MSE', 'problem_types': ['regression', 'quantile']}}],
+(_dystack pid=46754)    'XT': [{'criterion': 'gini', 'ag_args': {'name_suffix': 'Gini', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'entropy', 'ag_args': {'name_suffix': 'Entr', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'squared_error', 'ag_args': {'name_suffix': 'MSE', 'problem_types': ['regression', 'quantile']}}],
+(_dystack pid=46754) }
+(_dystack pid=46754) AutoGluon will fit 2 stack levels (L1 to L2) ...
+(_dystack pid=46754) Excluded models: [] (Specified by `excluded_model_types`)
+(_dystack pid=46754) Fitting 108 L1 models, fit_strategy="sequential" ...
+(_dystack pid=46754) Fitting model: LightGBMXT_BAG_L1 ... Training model for up to 4.76s of the 7.14s of remaining time.
+(_dystack pid=46754)    Fitting 8 child models (S1F1 - S1F8) | Fitting with ParallelLocalFoldFittingStrategy (8 workers, per: cpus=2, gpus=0, memory=0.14%)
+(_dystack pid=46754)    0.8643   = Validation score   (roc_auc)
+(_dystack pid=46754)    13.54s   = Training   runtime
+(_dystack pid=46754)    0.0s     = Validation runtime
+(_dystack pid=46754) Fitting model: WeightedEnsemble_L2 ... Training model for up to 7.15s of the -52.29s of remaining time.
+(_dystack pid=46754)    Ensemble Weights: {'LightGBMXT_BAG_L1': 1.0}
+(_dystack pid=46754)    0.8643   = Validation score   (roc_auc)
+(_dystack pid=46754)    0.0s     = Training   runtime
+(_dystack pid=46754)    0.0s     = Validation runtime
+(_dystack pid=46754) Excluded models: [] (Specified by `excluded_model_types`)
+(_dystack pid=46754) Fitting 108 L2 models, fit_strategy="sequential" ...
+(_dystack pid=46754) Fitting model: WeightedEnsemble_L3 ... Training model for up to 7.15s of the -54.84s of remaining time.
+(_dystack pid=46754)    Ensemble Weights: {'LightGBMXT_BAG_L1': 1.0}
+(_dystack pid=46754)    0.8643   = Validation score   (roc_auc)
+(_dystack pid=46754)    0.0s     = Training   runtime
+(_dystack pid=46754)    0.0s     = Validation runtime
+(_dystack pid=46754) AutoGluon training complete, total runtime = 62.36s ... Best model: WeightedEnsemble_L2 | Estimated inference throughput: 5488.7 rows/s (25 batch size)
+(_dystack pid=46754) TabularPredictor saved. To load, use: predictor = TabularPredictor.load("/mnt/c/Users/moham/8_churn/ml_artifacts/autogluon/ds_sub_fit/sub_fit_ho")
+(_dystack pid=46754) Deleting DyStack predictor artifacts (clean_up_fits=True) ...
+Leaderboard on holdout data (DyStack):
+                 model  score_holdout  score_val eval_metric  pred_time_test  pred_time_val   fit_time  pred_time_test_marginal  pred_time_val_marginal  fit_time_marginal  stack_level  can_infer  fit_order
+0    LightGBMXT_BAG_L1       0.797619   0.864271     roc_auc        4.681302       0.004501  13.541458                 4.681302                0.004501          13.541458            1       True          1
+1  WeightedEnsemble_L2       0.797619   0.864271     roc_auc        4.689246       0.004932  13.544015                 0.007943                0.000432           0.002558            2       True          2
+2  WeightedEnsemble_L3       0.797619   0.864271     roc_auc        4.692344       0.004903  13.543760                 0.011042                0.000402           0.002302            3       True          3
+        1        = Optimal   num_stack_levels (Stacked Overfitting Occurred: False)
+        325s     = DyStack   runtime |  275s     = Remaining runtime
+Starting main fit with num_stack_levels=1.
+        For future fit calls on this dataset, you can skip DyStack to save time: `predictor.fit(..., dynamic_stacking=False, num_stack_levels=1)`
+Beginning AutoGluon training ... Time limit = 275s
+AutoGluon will save models to "/mnt/c/Users/moham/8_churn/ml_artifacts/autogluon"
+Train Data Rows:    225
+Train Data Columns: 25
+Label Column:       churn
+Problem Type:       binary
+Preprocessing data ...
+Selected class <--> label mapping:  class 1 = 1, class 0 = 0
+Using Feature Generators to preprocess the data ...
+Fitting AutoMLPipelineFeatureGenerator...
+        Available Memory:                    4864.99 MB
+        Train Data (Original)  Memory Usage: 0.02 MB (0.0% of available memory)
+        Inferring data type of each feature based on column values. Set feature_metadata_in to manually specify special dtypes of the features.
+        Stage 1 Generators:
+                Fitting AsTypeFeatureGenerator...
+                        Note: Converting 10 features to boolean dtype as they only contain 2 unique values.
+        Stage 2 Generators:
+                Fitting FillNaFeatureGenerator...
+        Stage 3 Generators:
+                Fitting IdentityFeatureGenerator...
+        Stage 4 Generators:
+                Fitting DropUniqueFeatureGenerator...
+        Stage 5 Generators:
+                Fitting DropDuplicatesFeatureGenerator...
+        Useless Original Features (Count: 4): ['gender_nan', 'last_level_nan', 'os_nan', 'browser_nan']
+                These features carry no predictive signal and should be manually investigated.
+                This is typically a feature which has the same value for all rows.
+                These features do not need to be present at inference time.
+        Unused Original Features (Count: 1): ['browser_Mobile Safari']
+                These features were not used to generate any of the output features. Add a feature generator compatible with these features to utilize them.
+                Features can also be unused if they carry very little information, such as being categorical but having almost entirely unique values or being duplicates of other features.
+                These features do not need to be present at inference time.
+                ('bool', []) : 1 | ['browser_Mobile Safari']
+        Types of features in original data (raw dtype, special dtypes):
+                ('bool', [])  : 9 | ['gender_M', 'last_level_paid', 'os_Mac OS X', 'os_Ubuntu', 'os_Windows', ...]
+                ('float', []) : 2 | ['total_listen_time', 'avg_songs_per_session']
+                ('int', [])   : 9 | ['userId', 'total_songs', 'num_artists', 'num_thumbs_up', 'num_thumbs_down', ...]
+        Types of features in processed data (raw dtype, special dtypes):
+                ('float', [])     : 2 | ['total_listen_time', 'avg_songs_per_session']
+                ('int', [])       : 9 | ['userId', 'total_songs', 'num_artists', 'num_thumbs_up', 'num_thumbs_down', ...]
+                ('int', ['bool']) : 9 | ['gender_M', 'last_level_paid', 'os_Mac OS X', 'os_Ubuntu', 'os_Windows', ...]
+        0.0s = Fit runtime
+        20 features in original data used to generate 20 features in processed data.
+        Train Data (Processed) Memory Usage: 0.02 MB (0.0% of available memory)
+Data preprocessing and feature engineering runtime = 0.04s ...
+AutoGluon will gauge predictive performance using evaluation metric: 'roc_auc'
+        This metric expects predicted probabilities rather than predicted class labels, so you'll need to use predict_proba() instead of predict()
+        To change this, specify the eval_metric parameter of Predictor()
+Large model count detected (110 configs) ... Only displaying the first 3 models of each family. To see all, set `verbosity=3`.
+User-specified model hyperparameters to be fit:
+{
+        'NN_TORCH': [{}, {'activation': 'elu', 'dropout_prob': 0.10077639529843717, 'hidden_size': 108, 'learning_rate': 0.002735937344002146, 'num_layers': 4, 'use_batchnorm': True, 'weight_decay': 1.356433327634438e-12, 'ag_args': {'name_suffix': '_r79', 'priority': -2}}, {'activation': 'elu', 'dropout_prob': 0.11897478034205347, 'hidden_size': 213, 'learning_rate': 0.0010474382260641949, 'num_layers': 4, 'use_batchnorm': False, 'weight_decay': 5.594471067786272e-10, 'ag_args': {'name_suffix': '_r22', 'priority': -7}}],
+        'GBM': [{'extra_trees': True, 'ag_args': {'name_suffix': 'XT'}}, {}, {'learning_rate': 0.03, 'num_leaves': 128, 'feature_fraction': 0.9, 'min_data_in_leaf': 3, 'ag_args': {'name_suffix': 'Large', 'priority': 0, 'hyperparameter_tune_kwargs': None}}],
+        'CAT': [{}, {'depth': 6, 'grow_policy': 'SymmetricTree', 'l2_leaf_reg': 2.1542798306067823, 'learning_rate': 0.06864209415792857, 'max_ctr_complexity': 4, 'one_hot_max_size': 10, 'ag_args': {'name_suffix': '_r177', 'priority': -1}}, {'depth': 8, 'grow_policy': 'Depthwise', 'l2_leaf_reg': 2.7997999596449104, 'learning_rate': 0.031375015734637225, 'max_ctr_complexity': 2, 'one_hot_max_size': 3, 'ag_args': {'name_suffix': '_r9', 'priority': -5}}],
+        'XGB': [{}, {'colsample_bytree': 0.6917311125174739, 'enable_categorical': False, 'learning_rate': 0.018063876087523967, 'max_depth': 10, 'min_child_weight': 0.6028633586934382, 'ag_args': {'name_suffix': '_r33', 'priority': -8}}, {'colsample_bytree': 0.6628423832084077, 'enable_categorical': False, 'learning_rate': 0.08775715546881824, 'max_depth': 5, 'min_child_weight': 0.6294123374222513, 'ag_args': {'name_suffix': '_r89', 'priority': -16}}],
+        'FASTAI': [{}, {'bs': 256, 'emb_drop': 0.5411770367537934, 'epochs': 43, 'layers': [800, 400], 'lr': 0.01519848858318159, 'ps': 0.23782946566604385, 'ag_args': {'name_suffix': '_r191', 'priority': -4}}, {'bs': 2048, 'emb_drop': 0.05070411322605811, 'epochs': 29, 'layers': [200, 100], 'lr': 0.08974235041576624, 'ps': 0.10393466140748028, 'ag_args': {'name_suffix': '_r102', 'priority': -11}}],
+        'RF': [{'criterion': 'gini', 'ag_args': {'name_suffix': 'Gini', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'entropy', 'ag_args': {'name_suffix': 'Entr', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'squared_error', 'ag_args': {'name_suffix': 'MSE', 'problem_types': ['regression', 'quantile']}}],
+        'XT': [{'criterion': 'gini', 'ag_args': {'name_suffix': 'Gini', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'entropy', 'ag_args': {'name_suffix': 'Entr', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'squared_error', 'ag_args': {'name_suffix': 'MSE', 'problem_types': ['regression', 'quantile']}}],
+}
+AutoGluon will fit 2 stack levels (L1 to L2) ...
+Excluded models: [] (Specified by `excluded_model_types`)
+Fitting 108 L1 models, fit_strategy="sequential" ...
+Fitting model: LightGBMXT_BAG_L1 ... Training model for up to 183.03s of the 274.60s of remaining time.
+        Fitting 8 child models (S1F1 - S1F8) | Fitting with ParallelLocalFoldFittingStrategy (8 workers, per: cpus=2, gpus=0, memory=0.14%)
+        0.8263   = Validation score   (roc_auc)
+        17.63s   = Training   runtime
+        0.0s     = Validation runtime
+Fitting model: LightGBM_BAG_L1 ... Training model for up to 119.04s of the 210.62s of remaining time.
+        Fitting 8 child models (S1F1 - S1F8) | Fitting with ParallelLocalFoldFittingStrategy (8 workers, per: cpus=2, gpus=0, memory=0.15%)
+        0.8237   = Validation score   (roc_auc)
+        30.11s   = Training   runtime
+        0.0s     = Validation runtime
+Fitting model: RandomForestGini_BAG_L1 ... Training model for up to 42.60s of the 134.18s of remaining time.
+        0.8447   = Validation score   (roc_auc)
+        2.72s    = Training   runtime
+        0.04s    = Validation runtime
+Fitting model: RandomForestEntr_BAG_L1 ... Training model for up to 39.27s of the 130.85s of remaining time.
+        0.8537   = Validation score   (roc_auc)
+        0.35s    = Training   runtime
+        0.04s    = Validation runtime
+Fitting model: CatBoost_BAG_L1 ... Training model for up to 38.67s of the 130.24s of remaining time.
+        Fitting 8 child models (S1F1 - S1F8) | Fitting with ParallelLocalFoldFittingStrategy (8 workers, per: cpus=2, gpus=0, memory=8.36%)
+        Time limit exceeded... Skipping CatBoost_BAG_L1.
+Fitting model: WeightedEnsemble_L2 ... Training model for up to 274.61s of the 44.09s of remaining time.
+        Ensemble Weights: {'RandomForestEntr_BAG_L1': 0.85, 'LightGBMXT_BAG_L1': 0.15}
+        0.8578   = Validation score   (roc_auc)
+        0.01s    = Training   runtime
+        0.0s     = Validation runtime
+Excluded models: [] (Specified by `excluded_model_types`)
+Fitting 108 L2 models, fit_strategy="sequential" ...
+Fitting model: LightGBMXT_BAG_L2 ... Training model for up to 43.97s of the 43.93s of remaining time.
+        Fitting 8 child models (S1F1 - S1F8) | Fitting with ParallelLocalFoldFittingStrategy (8 workers, per: cpus=2, gpus=0, memory=0.16%)
+        0.8423   = Validation score   (roc_auc)
+        27.13s   = Training   runtime
+        0.01s    = Validation runtime
+Fitting model: WeightedEnsemble_L3 ... Training model for up to 274.61s of the -32.53s of remaining time.
+        Ensemble Weights: {'RandomForestEntr_BAG_L1': 1.0}
+        0.8537   = Validation score   (roc_auc)
+        0.01s    = Training   runtime
+        0.0s     = Validation runtime
+AutoGluon training complete, total runtime = 307.43s ... Best model: WeightedEnsemble_L2 | Estimated inference throughput: 3372.7 rows/s (29 batch size)
+TabularPredictor saved. To load, use: predictor = TabularPredictor.load("/mnt/c/Users/moham/8_churn/ml_artifacts/autogluon")
+
+--- AutoGluon Model Leaderboard (Sorted by roc_auc) ---
+                     model  score_test  score_val eval_metric  ...  fit_time_marginal  stack_level  can_infer  fit_order
+0  RandomForestEntr_BAG_L1    1.000000   0.853723     roc_auc  ...           0.347348            1       True          4
+1      WeightedEnsemble_L3    1.000000   0.853723     roc_auc  ...           0.012591            3       True          7
+2  RandomForestGini_BAG_L1    1.000000   0.844666     roc_auc  ...           2.724248            1       True          3
+3      WeightedEnsemble_L2    1.000000   0.857821     roc_auc  ...           0.009391            2       True          5
+4        LightGBMXT_BAG_L2    0.999856   0.842294     roc_auc  ...          27.125631            2       True          6
+5        LightGBMXT_BAG_L1    0.982174   0.826337     roc_auc  ...          17.631416            1       True          1
+6          LightGBM_BAG_L1    0.972685   0.823677     roc_auc  ...          30.109168            1       True          2
+
+[7 rows x 13 columns]
+
+--- Best Performing Model: RandomForestEntr_BAG_L1 ---
+Models and artifacts are saved in: ml_artifacts/autogluon
+
+--- (3/3) Training Final Model ---
+Starting model training...
+
+(churn) mohamed@DESKTOP-SPND545:/mnt/c/Users/moham/8_churn$ make train 
+
+--- (3/3) Training Final Model ---
+Starting model training with RandomForestClassifier...
+2025/08/22 02:58:10 INFO mlflow.tracking.fluent: Experiment with name 'Churn_Prediction' does not exist. Creating a new experiment.
+MLflow Run ID: c63402b4846f42f98f5ecb46d15509f1
+Evaluation Metrics: {'AUC_ROC': 0.8214285714285714, 'F1_Score': 0.4444444444444444, 'Precision': 1.0, 'Recall': 0.2857142857142857}
+2025/08/22 02:58:22 WARNING mlflow.models.model: `artifact_path` is deprecated. Please use `name` instead.
+2025/08/22 02:59:04 WARNING mlflow.models.model: Model logged without a signature and input example. Please set `input_example` parameter when logging the model to auto infer the model signature.
+Model training complete. Model saved to ml_artifacts/random_forest_churn_model.pkl
+--- Final Model Training Complete ---

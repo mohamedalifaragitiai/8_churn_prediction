@@ -1,0 +1,29 @@
+# Core
+pandas
+numpy
+scikit-learn
+
+# Visualization (optional, for EDA)
+matplotlib
+seaborn
+plotly
+
+# API
+fastapi
+uvicorn
+
+# Model tracking
+mlflow
+
+# Packaging & Environment
+python-dotenv
+
+# Code quality & formatting
+black
+ruff
+
+# Testing
+pytest
+
+# Jupyter (if needed for notebooks)
+jupyter
