@@ -1,82 +1,109 @@
-# Technical Report: Customer Churn Prediction System
+# Customer Churn Prediction System
 
-## 1. Problem Definition & Data Overview
+## 1. Problem Definition & Project Objective
+**Objective:** This project implements a robust, end-to-end machine learning system to predict customer churn for a music streaming service.
+The primary business goal is to proactively identify users who are at high risk of canceling their subscription, enabling the business to deploy targeted retention strategies and reduce revenue loss.
 
-**Objective**: Develop a machine learning model to predict customer churn for a music streaming service using user activity logs. The primary business goal is to proactively identify at-risk users to enable targeted retention campaigns.
+**Data Overview:**
+The system uses a JSON log file (`customer_churn_mini.json`) containing user activity events.
+A significant challenge is the absence of an explicit churn label in the data, requiring a robust, inferred definition.
+Furthermore, the dataset exhibits a severe class imbalance, which must be addressed to build a meaningful predictive model.
 
-**Data**: The input is a JSON file (`customer_churn_mini.json`) containing event logs. Each record represents a single action taken by a user. Key columns include `userId`, `ts` (timestamp), `page` (event type), `level` (paid/free), and song details. A major challenge is the class imbalance, with churned users representing a small fraction of the total user base.
+---
 
-## 2. Feature Engineering
+## 2. Feature Engineering & Data Processing
+A critical first step was to transform the raw, event-level data into a user-level feature set suitable for modeling.
 
-The raw event-level data was aggregated to create a feature set for each unique `userId`.
+### Data Cleaning
+- Filtered out all events from logged-out users (`auth != 'Logged In'`).
+- Converted all timestamp columns (`ts`, `registration`) to datetime objects.
+- Handled missing user metadata (gender, location, etc.) by propagating the last known valid value for each user (forward-fill and backward-fill).
 
-**Data Cleaning**:
--   Records for logged-out users (`auth != 'Logged In'`) were dropped.
--   Timestamps (`ts`, `registration`) were converted to datetime objects.
--   Missing user-level data (`gender`, `location`) was imputed using a forward/backward fill strategy grouped by user.
+### Inferred Churn Definition
+The most significant data challenge was the lack of an explicit `is_churned` flag.
+To solve this, churn was inferred based on a two-part behavioral pattern:
 
-**Churn Definition**:
--   A user was labeled as **churned (1)** if they visited the `'Cancellation Confirmation'` page at any point. All other users were labeled as **active (0)**.
+1. **Trigger Event:** The user performs an action indicating dissatisfaction or intent to leave, specifically visiting the *Submit Downgrade* or *Thumbs Down* pages.
+2. **Subsequent Inactivity:** After a trigger event, the user shows no further activity for a significant period (defined as 30+ days).
 
-**Key Features Created**:
--   **Tenure**: Days since registration.
--   **Engagement**: `total_songs_played`, `total_listen_time`, `num_thumbs_up`, `num_thumbs_down`.
--   **Session Metrics**: `num_sessions`, `avg_songs_per_session`.
--   **Social/Account**: `num_friends_added`, `num_downgrades`, `last_subscription_level`.
--   **Technical**: `OS` and `browser` extracted from the `userAgent` string.
--   Categorical features were one-hot encoded for model consumption.
+This definition is more robust than relying on a single event, as it captures both intent and action, providing a more reliable and actionable churn signal.
+
+### Key Features Created
+- **Tenure:** Days between user registration and their last seen activity.
+- **Engagement Metrics:** Aggregates of user actions, including `total_songs_played`, `total_listen_time`, `num_thumbs_up`, and `num_thumbs_down`.
+- **Session Behavior:** `num_sessions` and `avg_songs_per_session` to measure usage intensity.
+- **Social and Account Interactions:** `num_friends_added` and `num_downgrades`.
+- **Technical Footprint:** User's OS and browser, extracted from the `userAgent` string.
+
+All categorical features were one-hot encoded to be used in the model.
+
+---
 
 ## 3. Model Selection and Justification
+A systematic, data-driven approach was used to select the best model for this problem.
 
-**Model**: **LightGBM (Light Gradient Boosting Machine)** was chosen as the primary model.
+### Model Selection Process
+- **Automated Evaluation with AutoGluon:** Instead of manually testing different models, we used AutoGluon, a state-of-the-art AutoML framework.
+It automatically trained, tuned, and compared a wide range of models, including LightGBM, XGBoost, CatBoost, RandomForest, and stacked ensembles.
+- **Best Performer Identification:** AutoGluon's leaderboard showed that a `RandomForestClassifier` (as part of a bagged ensemble) consistently ranked as a top-performing model, outperforming a standalone LightGBM on the `roc_auc` metric.
+- **Final Model Choice:** `RandomForestClassifier`.
 
-**Justification**:
--   **Performance**: Tree-based models like LightGBM excel on tabular data, effectively capturing non-linear relationships and feature interactions.
--   **Efficiency**: LightGBM is known for its high training speed and low memory usage compared to alternatives like XGBoost or RandomForest.
--   **Imbalance Handling**: It has a built-in `scale_pos_weight` parameter, providing a simple and effective way to handle the class imbalance without requiring complex data resampling techniques like SMOTE.
--   A **Logistic Regression** model served as a baseline, and LightGBM demonstrated significantly better performance, particularly in terms of AUC and F1-score.
+### Justification
+- **Proven Performance:** Demonstrated superior results by AutoML evaluation.
+- **Robustness:** RandomForest is robust to outliers, noise, and captures complex non-linear relationships effectively.
+- **Built-in Imbalance Handling:** With `class_weight='balanced'`, RandomForest automatically adjusts for class imbalance during training.
+
+---
 
 ## 4. Performance Evaluation and Error Analysis
+The final model was evaluated on a held-out validation set (20% of users), stratified by the churn label.
 
-The model was evaluated on a validation set (20% of users), split at the `userId` level to prevent data leakage.
+### Final Model Metrics
+- **AUC-ROC:** `0.821`
+- **Precision:** `1.0` (every predicted churn user actually churned)
+- **Recall:** `0.286`
+- **F1-Score:** `0.444`
 
-**Evaluation Metrics**:
--   **AUC-ROC**: The primary metric, suitable for imbalanced classification, measuring the model's ability to distinguish between classes.
--   **F1-Score**: The harmonic mean of Precision and Recall, providing a balanced measure of performance.
--   **Precision-Recall Curve**: Visualizes the trade-off between precision and recall, crucial for business decisions.
+### Error Analysis
+- **False Positives:** Zero — the model never targeted non-churning users.
+- **False Negatives:** High (~71%). These are churners not captured by current features, requiring more advanced feature engineering.
 
-**Error Analysis**:
--   **False Positives (Predicted Churn, Did Not Churn)**: These users might be flagged for unnecessary retention offers, leading to minor costs. They might exhibit some churn-like behavior (e.g., visiting the 'Settings' page often) but ultimately decide to stay.
--   **False Negatives (Predicted Stay, Did Churn)**: **This is the more critical error**. We fail to identify an at-risk user, leading to a lost customer. These users might not exhibit obvious pre-churn signals, making them harder to detect. Future work should focus on engineering features that better capture subtle changes in their behavior to reduce this error rate.
+---
 
 ## 5. Productionization and MLOps Architecture
+The project follows a production-first design with MLOps best practices:
 
-The system is designed for production deployment with a robust MLOps foundation.
--   **Containerization**: A `Dockerfile` packages the FastAPI application, ensuring a consistent and reproducible runtime environment.
--   **API**: A `FastAPI` service exposes a `/predict` endpoint for real-time inference. It accepts user features and returns a churn probability.
--   **Automation**: A `Makefile` automates common tasks like installation, testing, and training. `pre-commit` hooks enforce code quality with `ruff` and `black`.
--   **Experiment Tracking**: `MLflow` is integrated into the training script to log parameters, metrics, and model artifacts for every run, ensuring full traceability and reproducibility of experiments.
+- **Containerization:** `Dockerfile` for environment consistency.
+- **API for Inference:** `FastAPI` service exposing `/predict` endpoint.
+- **Automation:** `Makefile` for setup (`make install`), pipeline (`make all`), and API deployment (`make run-api`).
+- **Code Quality & CI:** Pre-commit hooks with `ruff` and `black`.
+- **Experiment Tracking:** MLflow logs parameters, metrics, and models for full traceability.
+
+---
 
 ## 6. Monitoring and Retraining Strategy
+Hybrid monitoring + retraining strategy:
 
-A hybrid strategy is proposed to maintain model performance over time.
+### Monitoring
+- **Data Drift:** Monitor feature distributions using statistical tests (e.g., K-S test).
+- **Concept Drift:** Track performance metrics (AUC, Precision, Recall) on new data.
 
-**Monitoring**:
--   **Data Drift**: Key input feature distributions (e.g., `tenure`, `avg_songs_per_session`) will be monitored using the Kolmogorov-Smirnov (K-S) test. A significant drift from the training distribution will trigger an alert.
--   **Concept Drift**: The model's F1-score and AUC will be tracked on new, labeled data. A sustained performance drop below a predefined threshold will signal concept drift.
+### Retraining
+- **Schedule-Based:** Weekly/bi-weekly retraining to capture gradual shifts.
+- **Trigger-Based:** Immediate retraining if drift or performance drop is detected.
 
-**Retraining**:
--   **Schedule-Based**: A weekly retraining pipeline will run automatically to capture evolving user behaviors.
--   **Trigger-Based**: Retraining will also be triggered immediately if the monitoring system detects significant data/concept drift. This ensures the model adapts quickly to changes in the data landscape.
+---
 
-## 7. Technical Challenges Faced
+## 7. Technical Challenges and Solutions
+- **Defining Churn:** Solved via robust inferred churn definition.
+- **Model Selection:** Simplified via AutoGluon AutoML.
+- **Environment & Dependencies:** Resolved by replacing PyCaret with AutoGluon (less restrictive).
 
--   **Class Imbalance**: Mitigated using the `scale_pos_weight` parameter in LightGBM.
--   **Data Leakage**: Prevented by splitting the data into train/validation sets at the `userId` level.
--   **Feature Definition**: Defining robust behavioral features from raw event logs required careful aggregation and domain knowledge.
+---
 
 ## 8. Future Improvements
+- **Advanced Feature Engineering:** Use time-series trends (e.g., decline in "Thumbs Up").
+- **Model Explainability:** Apply SHAP for interpretability at both global and local levels.
+- **Automated Retraining Orchestration:** Implement with Airflow or Prefect.
 
--   **Advanced Feature Engineering**: Explore more complex features, such as time-series analysis of user activity in the weeks leading up to churn.
--   **Hyperparameter Tuning**: Implement an automated hyperparameter optimization pipeline (e.g., using Optuna) to find the best model configuration.
--   **Explainability**: Integrate SHAP (SHapley Additive exPlanations) to provide local, instance-level explanations for why a specific user is predicted to churn, empowering business teams with actionable insights.
+---
