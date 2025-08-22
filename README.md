@@ -91,7 +91,11 @@ The project is structured following software engineering best practices to ensur
 
 ### Project Structure
 The repository is organized into a modular structure:
-.
+## Project Structure
+
+The repository is organized into a modular structure:
+
+```text
 ├── Dockerfile # Defines the container for the API
 ├── Makefile # Automates project setup, training, and deployment
 ├── README.md # This project documentation
@@ -99,6 +103,10 @@ The repository is organized into a modular structure:
 │ └── main.py # FastAPI application for serving predictions
 ├── data/ # (Git-ignored) For raw and processed data
 ├── notebooks/ # Jupyter notebooks for EDA and analysis
+│ ├── 1_data_exploration.ipynb
+│ ├── 2_professional_churn_eda.ipynb
+│ ├── 3_advanced_eda_and_imbalance.ipynb
+│ └── EDA.ipynb
 ├── pyproject.toml # Manages all project dependencies via uv
 ├── scripts/
 │ ├── featurize.py # Feature engineering pipeline
@@ -107,7 +115,7 @@ The repository is organized into a modular structure:
 └── src/
 └── churn_predictor/ # Core source code for the project
 
-text
+```
 
 ### Key Technical Features
 *   **API Service:** A **FastAPI** application serves predictions via a `/predict` endpoint, packaged with **Docker** for a consistent and isolated runtime environment.
